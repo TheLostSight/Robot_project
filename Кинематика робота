@@ -1,11 +1,5 @@
 #include <math.h>
 
-#define MOTOR_PIN_1A 2
-#define MOTOR_PIN_1B 3
-#define MOTOR_PIN_2A 4
-#define MOTOR_PIN_2B 5
-#define MOTOR_PIN_3A 6
-#define MOTOR_PIN_3B 7
 #define Pi 3.14159
 
 float velocity = 0;
@@ -17,15 +11,10 @@ int MOTOR_PIN_PWM[3] = {8,9,10}; // пины для ШИМ'а трех мото�
 
 void setup() {
   // put your setup code here, to run once:
-  pinMode(MOTOR_PIN_1A, OUTPUT);
-  pinMode(MOTOR_PIN_1B, OUTPUT);
-  pinMode(MOTOR_PIN_2A, OUTPUT);
-  pinMode(MOTOR_PIN_2B, OUTPUT);
-  pinMode(MOTOR_PIN_3A, OUTPUT);
-  pinMode(MOTOR_PIN_3B, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
+  for(int i=0; i<6; i++)
+    pinMode(MOTOR_PIN_ARRAY[i], OUTPUT);
+  for(int i = 0; i < 3; i++)
+    pinMode(MOTOR_PIN_PWM[i], OUTPUT);
 }
 
 void loop() {
