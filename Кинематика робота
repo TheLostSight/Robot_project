@@ -1,0 +1,82 @@
+#include <math.h>
+
+#define MOTOR_PIN_1A 2
+#define MOTOR_PIN_1B 3
+#define MOTOR_PIN_2A 4
+#define MOTOR_PIN_2B 5
+#define MOTOR_PIN_3A 6
+#define MOTOR_PIN_3B 7
+#define Pi 3.14159
+
+float velocity = 0;
+double angle = 0;
+int coordinates[2] = {0, 0};
+const float static_speed = 5.0; // движение с этой скоростью в заданном направлении
+int MOTOR_PIN_ARRAY[6] = {2,3,4,5,6,7}; // пины трех моторов
+int MOTOR_PIN_PWM[3] = {8,9,10}; // пины для ШИМ'а трех моторов
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(MOTOR_PIN_1A, OUTPUT);
+  pinMode(MOTOR_PIN_1B, OUTPUT);
+  pinMode(MOTOR_PIN_2A, OUTPUT);
+  pinMode(MOTOR_PIN_2B, OUTPUT);
+  pinMode(MOTOR_PIN_3A, OUTPUT);
+  pinMode(MOTOR_PIN_3B, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  int v[3]; // скорости моторов
+  for(int i=1; i<4; i++) {
+    getSpeed(angle, i);
+    v[i-1] = velocity;
+  }
+  motorControl(v);
+}
+
+void getSpeed(double angle, int motor_num) {
+  switch(motor_num) {
+    case 1:
+        velocity = static_speed * cos(Pi/2 - angle);
+        break;
+    case 2:
+        velocity = static_speed * cos(angle - Pi/6);
+        break;
+    case 3:
+        velocity = static_speed * cos(angle + Pi/6);
+        break;
+  }
+}
+
+void motorControl(int velocities[]) {
+  int j=0; // счётчик
+  for(int i=0; i<3; i++) {
+    velocities[i] = map(velocities[i], -static_speed, static_speed, -255.0, 255.0); // Преобразование скорости в интервал [-255;255] во float, послед. использование в int;
+    if(velocities[i] > 0) {
+      analogWrite(MOTOR_PIN_PWM[i], (int) velocities[i]); //
+      digitalWrite(MOTOR_PIN_ARRAY[i+j], 1);
+      digitalWrite(MOTOR_PIN_ARRAY[i+1+j], 0);
+      j++;
+    }
+    else if(velocities[i] < 0) {
+      analogWrite(MOTOR_PIN_PWM[i], (int) -velocities[i]); //
+      digitalWrite(MOTOR_PIN_ARRAY[i+j], 0);
+      digitalWrite(MOTOR_PIN_ARRAY[i+1+j], 1);
+      j++;
+    }
+    else {
+      analogWrite(MOTOR_PIN_PWM[i], 0);
+      digitalWrite(MOTOR_PIN_ARRAY[i+j], 1);
+      digitalWrite(MOTOR_PIN_ARRAY[i+1+j], 1);
+      j++;
+    }
+  }
+}
+
+long map(float x, float in_min, float in_max, float out_min, float out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
